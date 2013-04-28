@@ -113,7 +113,7 @@ static int jiq_print(void *ptr)
  */
 static void jiq_print_wq(void *ptr)
 {
-	struct clientdata *data = (struct clientdata *) ptr;
+	struct clientdata *data = &jiq_data;
     
 	if (! jiq_print (ptr))
 		return;
@@ -241,7 +241,7 @@ static int jiq_init(void)
 {
 
 	/* this line is in jiq_init() */
-	INIT_WORK(&jiq_work, jiq_print_wq, &jiq_data);
+	INIT_WORK(&jiq_work, jiq_print_wq);
 
 	create_proc_read_entry("jiqwq", 0, NULL, jiq_read_wq, NULL);
 	create_proc_read_entry("jiqwqdelay", 0, NULL, jiq_read_wq_delayed, NULL);
