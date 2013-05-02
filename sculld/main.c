@@ -31,6 +31,11 @@
 #include "sculld.h"		/* local definitions */
 
 
+int register_ldd_device(struct ldd_device *);
+void unregister_ldd_device(struct ldd_device *);
+int register_ldd_driver(struct ldd_driver *);
+void unregister_ldd_driver(struct ldd_driver *);
+
 int sculld_major =   SCULLD_MAJOR;
 int sculld_devs =    SCULLD_DEVS;	/* number of bare sculld devices */
 int sculld_qset =    SCULLD_QSET;

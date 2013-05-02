@@ -101,13 +101,13 @@ int register_ldd_device(struct ldd_device *ldddev)
 	dev_set_name(&ldddev->dev, "%s", ldddev->name);
 	return device_register(&ldddev->dev);
 }
-EXPORT_SYMBOL(register_ldd_device);
+EXPORT_SYMBOL_GPL(register_ldd_device);
 
 void unregister_ldd_device(struct ldd_device *ldddev)
 {
 	device_unregister(&ldddev->dev);
 }
-EXPORT_SYMBOL(unregister_ldd_device);
+EXPORT_SYMBOL_GPL(unregister_ldd_device);
 
 /*
  * Crude driver interface.
@@ -142,8 +142,8 @@ void unregister_ldd_driver(struct ldd_driver *driver)
 {
 	driver_unregister(&driver->driver);
 }
-EXPORT_SYMBOL(register_ldd_driver);
-EXPORT_SYMBOL(unregister_ldd_driver);
+EXPORT_SYMBOL_GPL(register_ldd_driver);
+EXPORT_SYMBOL_GPL(unregister_ldd_driver);
 
 
 
