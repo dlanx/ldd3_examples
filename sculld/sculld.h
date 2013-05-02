@@ -16,6 +16,8 @@
 #include <linux/ioctl.h>
 #include <linux/cdev.h>
 #include <linux/device.h>
+#include <linux/semaphore.h>
+
 #include "../include/lddbus.h"
 
 /*
