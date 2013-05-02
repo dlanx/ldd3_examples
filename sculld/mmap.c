@@ -44,6 +44,7 @@ void sculld_vma_close(struct vm_area_struct *vma)
 	dev->vmas--;
 }
 
+
 /*
  * The nopage method: the core of the file. It retrieves the
  * page required from the sculld device and returns it to the
@@ -57,16 +58,16 @@ void sculld_vma_close(struct vm_area_struct *vma)
  * is individually decreased, and would drop to 0.
  */
 
-struct page *sculld_vma_nopage(struct vm_area_struct *vma,
-                                unsigned long address, int *type)
+int sculld_vma_fault(struct vm_area_struct *vma,
+                               struct vm_fault *vmf)
 {
 	unsigned long offset;
 	struct sculld_dev *ptr, *dev = vma->vm_private_data;
-	struct page *page = NOPAGE_SIGBUS;
 	void *pageptr = NULL; /* default to "missing" */
+	int ret = VM_FAULT_MINOR;
 
 	down(&dev->sem);
-	offset = (address - vma->vm_start) + (vma->vm_pgoff << PAGE_SHIFT);
+	offset = (vmf->pgoff - vma->vm_start) + (vma->vm_pgoff << PAGE_SHIFT);
 	if (offset >= dev->size) goto out; /* out of range */
 
 	/*
@@ -83,20 +84,16 @@ struct page *sculld_vma_nopage(struct vm_area_struct *vma,
 	if (!pageptr) goto out; /* hole or end-of-file */
 
 	/* got it, now increment the count */
-	get_page(page);
-	if (type)
-		*type = VM_FAULT_MINOR;
+	get_page(vmf->page);
   out:
 	up(&dev->sem);
-	return page;
+	return ret;
 }
-
-
 
 struct vm_operations_struct sculld_vm_ops = {
 	.open =     sculld_vma_open,
 	.close =    sculld_vma_close,
-	.nopage =   sculld_vma_nopage,
+	.fault =   sculld_vma_fault,
 };
 
 
