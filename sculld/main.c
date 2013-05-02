@@ -451,19 +451,26 @@ static int sculld_defer_op(int write, struct kiocb *iocb, char __user *buf,
 	return -EIOCBQUEUED;
 }
 
-
-static ssize_t sculld_aio_read(struct kiocb *iocb, char __user *buf, size_t count,
-		loff_t pos)
+static ssize_t sculld_aio_read(struct kiocb *iocb, const struct iovec *iov,
+		unsigned long nr_segs, loff_t pos)
 {
+	char __user *buf = iov[0].iov_base;
+	size_t count = iov[0].iov_len;
+
+	if (nr_segs != 1)
+		return -EINVAL;
+
 	return sculld_defer_op(0, iocb, buf, count, pos);
 }
 
-static ssize_t sculld_aio_write(struct kiocb *iocb, const char __user *buf,
-		size_t count, loff_t pos)
+static ssize_t sculld_aio_write(struct kiocb *iocb, const struct iovec *iov,
+		unsigned long nr_segs, loff_t pos)
 {
+	char __user *buf = iov[0].iov_base;
+	size_t count = iov_length(iov, nr_segs);
+
 	return sculld_defer_op(1, iocb, (char __user *) buf, count, pos);
 }
-
 
  
 /*
