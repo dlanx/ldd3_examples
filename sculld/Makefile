@@ -24,11 +24,12 @@ else
 KERNELDIR ?= /lib/modules/$(shell uname -r)/build
 PWD       := $(shell pwd)
 
+KBUILD_EXTRA_SYMBOLS = $(PWD)/../lddbus/Module.symvers
+
 modules:
 	$(MAKE) -C $(KERNELDIR) M=$(PWD) LDDINC=$(PWD) modules
 
 endif
-
 
 install:
 	install -d $(INSTALLDIR)
