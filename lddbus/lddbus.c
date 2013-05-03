@@ -32,7 +32,10 @@ static char *Version = "$Revision: 1.9 $";
  */
 static int ldd_uevent(struct device *dev, struct kobj_uevent_env *env)
 {
-	if (add_uevent_var(env, "LDDBUS_VERSION=%s", Version))
+	struct ldd_device *ldev = to_ldd_device(dev);
+
+	if (add_uevent_var(env, "LDDBUS_VERSION=%s, LDDBUS_NAME=%s",
+			Version, ldev->name))
 		return -ENOMEM;
 	return 0;
 }
@@ -80,7 +83,6 @@ static ssize_t show_bus_version(struct bus_type *bus, char *buf)
 static BUS_ATTR(version, S_IRUGO, show_bus_version, NULL);
 
 
-
 /*
  * LDD devices.
  */
@@ -91,7 +93,10 @@ static BUS_ATTR(version, S_IRUGO, show_bus_version, NULL);
  * release function.
  */
 static void ldd_dev_release(struct device *dev)
-{ }
+{
+	struct ldd_device *ldev = to_ldd_device(dev);
+	pr_info("%s: name %s\n", __func__, ldev->name);
+}
 
 int register_ldd_device(struct ldd_device *ldddev)
 {
