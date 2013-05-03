@@ -1,0 +1,2 @@
+# give og+rw for sculld
+SUBSYSTEM=="ldddev", KERNEL=="sculld*", MODE="0666"
