@@ -53,7 +53,21 @@ struct sculld_dev *sculld_devices; /* allocated in sculld_init */
 int sculld_trim(struct sculld_dev *dev);
 void sculld_cleanup(void);
 
+int ldd_driver_probe(struct device *dev)
+{
+	struct sculld_dev *d = dev_get_drvdata(dev);
 
+	pr_info("%s: name %s\n", __func__, d->devname);
+	return 0;
+}
+
+int ldd_driver_remove(struct device *dev)
+{
+	struct sculld_dev *d = dev_get_drvdata(dev);
+
+	pr_info("%s: name %s\n", __func__, d->devname);
+	return 0;
+}
 
 /* Device model stuff */
 
@@ -62,6 +76,8 @@ static struct ldd_driver sculld_driver = {
 	.module = THIS_MODULE,
 	.driver = {
 		.name = "sculld",
+		.probe = &ldd_driver_probe,
+		.remove = &ldd_driver_remove,
 	},
 };
 
