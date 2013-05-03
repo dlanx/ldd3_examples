@@ -36,6 +36,7 @@ void unregister_ldd_device(struct ldd_device *);
 int register_ldd_driver(struct ldd_driver *);
 void unregister_ldd_driver(struct ldd_driver *);
 
+struct class *ldd_class;
 int sculld_major =   SCULLD_MAJOR;
 int sculld_devs =    SCULLD_DEVS;	/* number of bare sculld devices */
 int sculld_qset =    SCULLD_QSET;
@@ -579,6 +580,9 @@ static void sculld_register_dev(struct sculld_dev *dev, int index)
 	dev_set_drvdata(&dev->ldev.dev, dev);
 	register_ldd_device(&dev->ldev);
 	device_create_file(&dev->ldev.dev, &dev_attr_dev);
+
+	device_create(ldd_class, NULL, MKDEV(sculld_major, index),
+		NULL, "sculld%d", index);
 }
 
 
@@ -591,6 +595,11 @@ int sculld_init(void)
 	int result, i;
 	dev_t dev = MKDEV(sculld_major, 0);
 	
+	ldd_class = class_create(THIS_MODULE, "ldddev");
+	if(IS_ERR(ldd_class)) {
+		pr_err("fail creat ldd_class\n");
+		return PTR_ERR(ldd_class);
+	}
 	/*
 	 * Register your major, and accept a dynamic number.
 	 */
@@ -648,11 +657,13 @@ void sculld_cleanup(void)
 #endif
 
 	for (i = 0; i < sculld_devs; i++) {
+		device_destroy(ldd_class, MKDEV(sculld_major, i));
 		unregister_ldd_device(&sculld_devices[i].ldev);
 		cdev_del(&sculld_devices[i].cdev);
 		sculld_trim(sculld_devices + i);
 	}
 	kfree(sculld_devices);
+	class_destroy(ldd_class);
 	unregister_ldd_driver(&sculld_driver);
 	unregister_chrdev_region(MKDEV (sculld_major, 0), sculld_devs);
 }
